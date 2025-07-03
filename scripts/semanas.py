@@ -45,32 +45,33 @@ print("Semanas a descargar:", len(semanas))
 
 
 # Ruta a la carpeta de salidas dentro de 'salidas'
-ruta_salida_base = os.path.abspath("salidas")
-os.makedirs(ruta_salida_base, exist_ok=True)
+ruta_base_descargas = os.path.abspath("descargas")
+os.makedirs(ruta_base_descargas, exist_ok=True)
+
 
 print("📂 Listando semanas disponibles en SIRGAS...")
 for semana in semanas:
     print(f"\n📂 Procesando semana {semana}...")
-    
-    try:
-        ftp.cwd(f'/pub/gps/SIRGAS/{semana}/')  # Cambiar al directorio de la semana
-        
-        # Obtener lista de archivos
-        archivos = ftp.nlst()
 
-        # Buscar archivo .crd que contenga el número de semana
+    try:
+        ftp.cwd(f'/pub/gps/SIRGAS/{semana}/')
+
+        archivos = ftp.nlst()
         archivo_crd = next((a for a in archivos if semana in a and a.endswith('.crd')), None)
 
         if archivo_crd:
             print(f"📥 Descargando archivo: {archivo_crd}")
-            ruta_archivo = os.path.join(ruta_salida_base, archivo_crd)
+            carpeta_semana = os.path.join(ruta_base_descargas, semana)
+            os.makedirs(carpeta_semana, exist_ok=True)
+
+            ruta_archivo = os.path.join(carpeta_semana, archivo_crd)
             with open(ruta_archivo, 'wb') as f:
                 ftp.retrbinary(f'RETR {archivo_crd}', f.write)
         else:
             print(f"❌ No se encontró archivo .crd para la semana {semana}")
 
         ftp.cwd('/')
-    
+
     except Exception as e:
         print(f"❌ No se pudo acceder a la semana {semana}: {e}")
         continue
@@ -91,12 +92,10 @@ else:
     print("❌ La carpeta no existe")
 # Lista para guardar los DataFrames filtrados de cada archivo
 dfs = []
-
-# Columnas y tipos para leer los archivos .crd
-columnas= ['NUM', 'STATION', 'NAME', 'X (M)', 'Y (M)','Z (M)', 'FLAG']
+columnas = ['NUM', 'STATION', 'NAME', 'X (M)', 'Y (M)','Z (M)', 'FLAG']
 tipos = {
     'NUM': str,
-    'STATION':str,
+    'STATION': str,
     'NAME': str,
     'X (M)': float,
     'Y (M)': float,
@@ -104,34 +103,28 @@ tipos = {
     'FLAG': str
 }
 
-# Iterar por cada archivo en la carpeta 'salidas'
-for archivo in os.listdir(folder):
-    if archivo.endswith('.crd'):
-        ruta = os.path.join(folder, archivo)
-        # Leer el archivo .crd
-        # Extraer la semana del nombre del archivo (asumiendo que contiene el número de semana como '20XX')
-        semana = ''.join(filter(str.isdigit, archivo))[:4]  # Ajusta si el formato de nombre cambia
+# Buscar en cada subcarpeta dentro de 'descargas'
+for semana in semanas:
+    carpeta_semana = os.path.join(ruta_base_descargas, semana)
+    if os.path.exists(carpeta_semana):
+        for archivo in os.listdir(carpeta_semana):
+            if archivo.endswith('.crd'):
+                ruta = os.path.join(carpeta_semana, archivo)
+                df = pd.read_csv(ruta, sep=r'\s+', skiprows=6, names=columnas, dtype=tipos)
 
-        # Leer el archivo .crd
-        df = pd.read_csv(ruta, sep=r'\s+', skiprows=6, names=columnas, dtype=tipos)
-
-        # Filtrar por STATION == 'BOGA'
-        df = df[df['STATION'] == 'BOGA']
-
-        # Añadir la columna de semana si hay datos
-        if not df.empty:
-            df['SEMANA'] = semana  # Añade columna SEMANA como str
-            dfs.append(df)
-
+                df = df[df['STATION'] == 'BOGA']
+                if not df.empty:
+                    df['SEMANA'] = semana
+                    dfs.append(df)
+                    
 # Concatenar todos los DataFrames filtrados
 if dfs:
     DATA = pd.concat(dfs, ignore_index=True)
-    # Exportar el resultado a un CSV en 'data/'
-    output_csv = os.path.abspath(os.path.join("salidas", "DATA.csv"))
+    output_csv = os.path.join(ruta_base_descargas, "DATA.csv")
     DATA.to_csv(output_csv, index=False)
-
 else:
-    DATA = pd.DataFrame(columns=columnas)  # 
+    DATA = pd.DataFrame(columns=columnas)
+
 
 print(DATA.info())
 print(DATA.describe())
