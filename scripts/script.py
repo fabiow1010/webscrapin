@@ -1,6 +1,7 @@
 import os
 import requests
 from requests.auth import HTTPBasicAuth
+from dotenv import load_dotenv
 
 def get_adjacent_days(day_input):
     day_input = int(day_input)
@@ -46,7 +47,10 @@ def descargar_archivos(weeks, dia_central, username, password):
 
 semanas = [1185, 1186]
 dia_central = 3 
-usuario = "FABIAN34"
-contraseña = "Thomasesgay10"
+
+
+load_dotenv()
+usuario = os.getenv("USUARIO")
+contraseña = os.getenv("CONTRASEÑA")
 
 descargar_archivos(semanas, dia_central, usuario, contraseña)
