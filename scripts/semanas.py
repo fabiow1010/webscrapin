@@ -36,7 +36,7 @@ semanas = [
 
 """
 
-semanas = ["1185", "1186"]
+semanas = ["2327", "2328"]
 
 print("Semanas a descargar:", len(semanas))
 
@@ -80,102 +80,3 @@ for semana in semanas:
 ftp.quit()
 print("\n✅ Descarga finalizada.")
 
-## analisis de cada archivo crd
-folder = os.path.abspath("salidas")
-print(f"📁 Accediendo a carpeta: {folder}")
-
-# Verifica si existe y muestra contenido
-if os.path.exists(folder):
-    archivos = os.listdir(folder)
-    print(f"📄 Archivos encontrados: {archivos}")
-else:
-    print("❌ La carpeta no existe")
-# Lista para guardar los DataFrames filtrados de cada archivo
-dfs = []
-columnas = ['NUM', 'STATION', 'NAME', 'X (M)', 'Y (M)','Z (M)', 'FLAG']
-tipos = {
-    'NUM': str,
-    'STATION': str,
-    'NAME': str,
-    'X (M)': float,
-    'Y (M)': float,
-    'Z (M)': float,
-    'FLAG': str
-}
-
-# Buscar en cada subcarpeta dentro de 'descargas'
-for semana in semanas:
-    carpeta_semana = os.path.join(ruta_base_descargas, semana)
-    if os.path.exists(carpeta_semana):
-        for archivo in os.listdir(carpeta_semana):
-            if archivo.endswith('.crd'):
-                ruta = os.path.join(carpeta_semana, archivo)
-                df = pd.read_csv(ruta, sep=r'\s+', skiprows=6, names=columnas, dtype=tipos)
-
-                df = df[df['STATION'] == 'BOGA']
-                if not df.empty:
-                    df['SEMANA'] = semana
-                    dfs.append(df)
-                    
-# Concatenar todos los DataFrames filtrados
-if dfs:
-    DATA = pd.concat(dfs, ignore_index=True)
-    output_csv = os.path.join(ruta_base_descargas, "DATA.csv")
-    DATA.to_csv(output_csv, index=False)
-else:
-    DATA = pd.DataFrame(columns=columnas)
-
-
-print(DATA.info())
-print(DATA.describe())
-print(DATA)
-
-
-## plotear los datos
-
-DATA[['X (M)', 'Y (M)', 'Z (M)']] = DATA[['X (M)', 'Y (M)', 'Z (M)']].apply(pd.to_numeric)
-
-# Estadísticas básicas
-summary = DATA[['X (M)', 'Y (M)', 'Z (M)']].describe()
-print("📊 Estadísticas resumidas:")
-print(summary)
-# Cambios absolutos respecto al primer valor
-ref = DATA.iloc[0][['X (M)', 'Y (M)', 'Z (M)']]
-DATA['delta_X'] = DATA['X (M)'] - ref['X (M)']
-DATA['delta_Y'] = DATA['Y (M)'] - ref['Y (M)']
-DATA['delta_Z'] = DATA['Z (M)'] - ref['Z (M)']
-print("\n📈 Cambios máximos respecto al primer punto:")
-# Gráficos de cambio en X, Y y Z respecto al primer valor
-
-# Gráficos de cambio en X, Y y Z respecto al primer valor (comparando respecto al primer dato)
-#define los parametros de las figuras
-fig, axs = plt.subplots(3, 1, figsize=(12, 12), sharex=True)
-#declara los titulos de las figuras
-fig.suptitle('Cambios en coordenadas X, Y, Z respecto al primer dato', fontsize=16)
-
-#declara valores para los ejes de X[M]
-axs[0].plot(DATA.index, DATA['delta_X'], marker='o', label='ΔX respecto al primer dato')
-axs[0].axhline(0, color='gray', linestyle='--')
-axs[0].set_ylabel('ΔX (m)')
-axs[0].set_title('Cambio en X respecto al primer dato')
-axs[0].legend()
-axs[0].grid(True)
-#declara valores para los ejes de Y[M]
-axs[1].plot(DATA.index, DATA['delta_Y'], marker='o', color='orange', label='ΔY respecto al primer dato')
-axs[1].axhline(0, color='gray', linestyle='--')
-axs[1].set_ylabel('ΔY (m)')
-axs[1].set_title('Cambio en Y respecto al primer dato')
-axs[1].legend()
-axs[1].grid(True)
-
-#declara valores para los ejes de Z[M]
-axs[2].plot(DATA.index, DATA['delta_Z'], marker='o', color='green', label='ΔZ respecto al primer dato')
-axs[2].axhline(0, color='gray', linestyle='--')
-axs[2].set_ylabel('ΔZ (m)')
-axs[2].set_title('Cambio en Z respecto al primer dato')
-axs[2].legend()
-axs[2].grid(True)
-
-plt.xlabel('Observación')
-plt.tight_layout()
-plt.show()

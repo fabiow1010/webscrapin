@@ -1,56 +1,64 @@
 import os
+import gzip
 import requests
-from requests.auth import HTTPBasicAuth
-from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
-def get_adjacent_days(day_input):
-    day_input = int(day_input)
-    days = set([day_input])
-    if day_input > 0:
-        days.add(day_input - 1)
-    if day_input < 6:
-        days.add(day_input + 1)
-    return sorted(list(days))
+def get_julian_day(year, week, dow):
+    gps_start = datetime(1980, 1, 6)
+    date = gps_start + timedelta(weeks=week, days=dow)
+    year = date.strftime("%Y")
+    doy = date.strftime("%j")
+    return year + doy + "0000", date
 
-def descargar_archivos(weeks, dia_central, username, password):
+def descomprimir_gz(ruta_entrada):
+    if ruta_entrada.endswith(".gz"):
+        ruta_salida = ruta_entrada[:-3]  # quita .gz
+        try:
+            with gzip.open(ruta_entrada, 'rb') as f_in:
+                with open(ruta_salida, 'wb') as f_out:
+                    f_out.write(f_in.read())
+            print(f"🗃️ Descomprimido: {ruta_salida}")
+            os.remove(ruta_entrada)
+        except Exception as e:
+            print(f"⚠️ Error descomprimiendo {ruta_entrada}: {e}")
+
+def descargar_archivos_modernos(weeks, dia_central):
     base_url = "https://cddis.nasa.gov/archive/gnss/products"
-    session = requests.Session()
-    session.auth = HTTPBasicAuth(username, password)
-    session.headers.update({'User-Agent': 'NASA Downloader'})
-
-    dias = get_adjacent_days(dia_central)
-
+    dias = [dia_central - 1, dia_central, dia_central + 1]
+    dias = [d for d in dias if 0 <= d <= 6]
     base_path = os.path.join(os.getcwd(), "descargas") 
 
+    session = requests.Session()
+    session.headers.update({'User-Agent': 'nasa-client'})
+
     for week in weeks:
-        folder = os.path.join(base_path, str(week))  # Carpeta: descargas/1185/
+        folder = os.path.join(base_path, str(week))
         os.makedirs(folder, exist_ok=True)
 
         for day in dias:
-            for prefix in ["igs", "igl"]:
-                filename = f"{prefix}{week}{day}.sp3.Z"
-                url = f"{base_url}/{week}/{filename}"
-                save_path = os.path.join(folder, filename)
-                print(f"🔄 Descargando: {url}")
-                try:
-                    response = session.get(url, stream=True, timeout=30)
-                    if response.status_code == 200:
-                        with open(save_path, "wb") as f:
-                            for chunk in response.iter_content(chunk_size=8192):
-                                f.write(chunk)
-                        print(f"✅ Guardado: {save_path}")
-                    else:
-                        print(f"❌ No encontrado ({response.status_code}): {url}")
-                except Exception as e:
-                    print(f"⚠️ Error al descargar {url}: {e}")
+            fecha_str, date = get_julian_day(2024, week, day)
+            # Nombre del archivo según el nuevo estándar
+            filename = f"IGS0OPSRAP_{fecha_str}_01D_15M_ORB.SP3.gz"
+            url = f"{base_url}/{week}/{filename}"
+            save_path = os.path.join(folder, filename)
 
+            print(f"🔄 Descargando: {url}")
+            try:
+                r = session.get(url, stream=True, timeout=30)
+                if r.status_code == 200:
+                    with open(save_path, "wb") as f:
+                        for chunk in r.iter_content(chunk_size=8192):
+                            f.write(chunk)
+                    print(f"✅ Guardado: {save_path}")
+                    descomprimir_gz(save_path)
+                else:
+                    print(f"❌ {r.status_code} al descargar: {url}")
+                    print(r.text[:200])
+            except Exception as e:
+                print(f"⚠️ Error: {e}")
 
-semanas = [1185, 1186]
-dia_central = 3 
+# Configuración
+semanas = [2327, 2328]
+dia_central = 3  # miércoles
 
-
-load_dotenv()
-usuario = os.getenv("USUARIO")
-contraseña = os.getenv("CONTRASEÑA")
-
-descargar_archivos(semanas, dia_central, usuario, contraseña)
+descargar_archivos_modernos(semanas, dia_central)

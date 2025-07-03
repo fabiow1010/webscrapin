@@ -2,3 +2,7 @@ salidas/
 descargas/
 .venv/
 .env
+__pycache__/
+*.pyc
+*.pyo   
+cookies.txt
