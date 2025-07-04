@@ -5,8 +5,7 @@ import os
 
 # Parámetros
 semanas = ["2327", "2328"]
-estaciones_a_buscar = ["BOGA", "MANA", "CALI"]  # Puedes agregar más aquí
-
+estaciones_a_buscar = ["BOGA", "BGTA", "PERA"] 
 # Ruta base
 ruta_base_descargas = os.path.abspath("descargas")
 os.makedirs(ruta_base_descargas, exist_ok=True)
@@ -60,42 +59,50 @@ print(DATA)
 # Asegura tipo numérico
 DATA[['X (M)', 'Y (M)', 'Z (M)']] = DATA[['X (M)', 'Y (M)', 'Z (M)']].apply(pd.to_numeric)
 
-# Estadísticas
-summary = DATA[['X (M)', 'Y (M)', 'Z (M)']].describe()
-print("📊 Estadísticas resumidas:")
-print(summary)
+# Estadísticas generales
+print("📊 Estadísticas resumidas generales:")
+print(DATA[['X (M)', 'Y (M)', 'Z (M)']].describe())
 
-# Cambios respecto al primer punto
-ref = DATA.iloc[0][['X (M)', 'Y (M)', 'Z (M)']]
-DATA['delta_X'] = DATA['X (M)'] - ref['X (M)']
-DATA['delta_Y'] = DATA['Y (M)'] - ref['Y (M)']
-DATA['delta_Z'] = DATA['Z (M)'] - ref['Z (M)']
+# Agrupar por estación
+for estacion, grupo in DATA.groupby('STATION'):
+    print(f"\n📍 Procesando estación: {estacion}")
+    
+    grupo = grupo.sort_values(by='SEMANA')  # Opcional: ordenar por semana si es string
 
-# Gráfico
-fig, axs = plt.subplots(3, 1, figsize=(12, 12), sharex=True)
-fig.suptitle('Cambios en coordenadas X, Y, Z respecto al primer dato', fontsize=16)
+    # Referencia: primer valor de coordenadas
+    ref = grupo.iloc[0][['X (M)', 'Y (M)', 'Z (M)']]
+    grupo['delta_X'] = grupo['X (M)'] - ref['X (M)']
+    grupo['delta_Y'] = grupo['Y (M)'] - ref['Y (M)']
+    grupo['delta_Z'] = grupo['Z (M)'] - ref['Z (M)']
 
-axs[0].plot(DATA.index, DATA['delta_X'], marker='o', label='ΔX')
-axs[0].axhline(0, color='gray', linestyle='--')
-axs[0].set_ylabel('ΔX (m)')
-axs[0].set_title('Cambio en X')
-axs[0].legend()
-axs[0].grid(True)
+    # Estadísticas resumidas por estación
+    print(grupo[['delta_X', 'delta_Y', 'delta_Z']].describe())
 
-axs[1].plot(DATA.index, DATA['delta_Y'], marker='o', color='orange', label='ΔY')
-axs[1].axhline(0, color='gray', linestyle='--')
-axs[1].set_ylabel('ΔY (m)')
-axs[1].set_title('Cambio en Y')
-axs[1].legend()
-axs[1].grid(True)
+    # Gráficos por estación
+    fig, axs = plt.subplots(3, 1, figsize=(12, 12), sharex=True)
+    fig.suptitle(f'Cambios en coordenadas X, Y, Z - Estación {estacion}', fontsize=16)
 
-axs[2].plot(DATA.index, DATA['delta_Z'], marker='o', color='green', label='ΔZ')
-axs[2].axhline(0, color='gray', linestyle='--')
-axs[2].set_ylabel('ΔZ (m)')
-axs[2].set_title('Cambio en Z')
-axs[2].legend()
-axs[2].grid(True)
+    axs[0].plot(grupo.index, grupo['delta_X'], marker='o', label='ΔX')
+    axs[0].axhline(0, color='gray', linestyle='--')
+    axs[0].set_ylabel('ΔX (m)')
+    axs[0].set_title('Cambio en X')
+    axs[0].legend()
+    axs[0].grid(True)
 
-plt.xlabel('Observación')
-plt.tight_layout()
-plt.show()
+    axs[1].plot(grupo.index, grupo['delta_Y'], marker='o', color='orange', label='ΔY')
+    axs[1].axhline(0, color='gray', linestyle='--')
+    axs[1].set_ylabel('ΔY (m)')
+    axs[1].set_title('Cambio en Y')
+    axs[1].legend()
+    axs[1].grid(True)
+
+    axs[2].plot(grupo.index, grupo['delta_Z'], marker='o', color='green', label='ΔZ')
+    axs[2].axhline(0, color='gray', linestyle='--')
+    axs[2].set_ylabel('ΔZ (m)')
+    axs[2].set_title('Cambio en Z')
+    axs[2].legend()
+    axs[2].grid(True)
+
+    plt.xlabel('Observación')
+    plt.tight_layout()
+    plt.show()
