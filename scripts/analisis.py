@@ -5,7 +5,7 @@ import os
 
 # Parámetros
 semanas = ["2327", "2328", "2329", "2330", "2331", "2335", "2336", "2336"]
-estaciones_a_buscar = ["BOGA", "BGTA", "PERA"]
+estaciones_a_buscar = ["BOGA", "BOGT"]
 
 # Ruta base
 ruta_base_descargas = os.path.abspath("descargas")
@@ -63,6 +63,10 @@ DATA[['X (M)', 'Y (M)', 'Z (M)']] = DATA[['X (M)', 'Y (M)', 'Z (M)']].apply(pd.t
 # Estadísticas generales
 print("📊 Estadísticas resumidas generales:")
 print(DATA[['X (M)', 'Y (M)', 'Z (M)']].describe())
+
+# Carpeta para guardar gráficos
+carpeta_graficas = os.path.join(ruta_base_descargas, "graficas_estaciones")
+os.makedirs(carpeta_graficas, exist_ok=True)
 
 # Agrupar por estación
 for estacion, grupo in DATA.groupby('STATION'):
@@ -122,4 +126,10 @@ for estacion, grupo in DATA.groupby('STATION'):
 
     plt.xlabel('Observación')
     plt.tight_layout()
-    plt.show()
+
+    # Guardar gráfico
+    nombre_archivo = f"{estacion}_desplazamientos.png".replace(" ", "_")
+    ruta_grafica = os.path.join(carpeta_graficas, nombre_archivo)
+    plt.savefig(ruta_grafica)
+    plt.close()
+    print(f"✅ Gráfica guardada: {ruta_grafica}")
