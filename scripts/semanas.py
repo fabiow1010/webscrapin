@@ -36,7 +36,7 @@ semanas = [
 
 """
 
-semanas = ["2327", "2328"]
+semanas = ["2327", "2328","2329","2330","2331","2335","2336","2336"]
 
 print("Semanas a descargar:", len(semanas))
 

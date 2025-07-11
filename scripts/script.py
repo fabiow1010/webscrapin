@@ -118,7 +118,7 @@ def descargar_glonass(weeks, dia_central):
                     print(f"⚠️ Error al descargar {url}: {e}")
 
 # Ejecución
-semanas = [2327, 2328]
-dia_central = 6  # sábado
+semanas = [2336]
+dia_central = 6
 descargar_GPS(semanas, dia_central)
 descargar_glonass(semanas, dia_central)
