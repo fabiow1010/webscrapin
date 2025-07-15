@@ -57,7 +57,7 @@ pip install -r requeriments.txt
 
 ## 🛠️ Configuración inicial
 
-1. **(Opcional)** Crear un archivo `.env` dentro de `scripts/` para almacenar credenciales de descarga:
+1. **(Obligatorio)** Crear un archivo `.env` en la raiz de proyecto para almacenar credenciales de descarga de CDDIS/NASA:
 
    ```bash
    USUARIO=tu_usuario
@@ -74,8 +74,9 @@ pip install -r requeriments.txt
 3. Abre `scripts/index.py` y ajusta:
 
    * Las semanas a procesar (`semanas`)
+   * Días de la semana (0-6) del procesamiento(`dia_central`)
    * Las estaciones base (`estaciones`)
-   * La ruta del archivo Excel de entrada, si aplica.
+   * La ruta del archivo Excel de entrada o salida, si aplica.
 
 ---
 
