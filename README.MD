@@ -1,11 +1,10 @@
 
 
-```markdown
+
 # GNSS FabiDev
 
 Este proyecto permite **descargar, procesar y analizar archivos de efemérides GNSS y coordenadas de estaciones**, integrando varios scripts en Python para automatizar todo el flujo de trabajo.
 
----
 
 ## 📁 Estructura del proyecto
 
@@ -31,7 +30,7 @@ GNSS-FabiDev/
 ├── coordenadas\_extraidas.xlsx  # Versión Excel de las coordenadas
 ├── requeriments.txt            # Requisitos del proyecto
 └── README.MD
-
+```
 
 
 > ⚠️ **Nota importante:** Algunas carpetas como `descargas`, `graficas_salida` y `descargas/reportes` no se incluyen en el repositorio por defecto. **Deben ser creadas manualmente** o se crearán automáticamente durante la ejecución del script.
@@ -53,7 +52,7 @@ Instalación:
 pip install -r requeriments.txt
 ````
 
----
+
 
 ## 🛠️ Configuración inicial
 
@@ -78,7 +77,7 @@ pip install -r requeriments.txt
    * Las estaciones base (`estaciones`)
    * La ruta del archivo Excel de entrada o salida, si aplica.
 
----
+
 
 ## ▶️ Ejecución
 
@@ -90,7 +89,7 @@ El script `index.py` ejecuta todo el flujo: descarga de efemérides, descarga de
 python scripts/index.py
 ```
 
----
+
 
 ### Opción 2: Ejecuciones parciales
 
