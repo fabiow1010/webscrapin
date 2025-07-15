@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 # Parámetros
-semanas = ["2327", "2328", "2329", "2330", "2331", "2335", "2336", "2336"]
+semanas = ["2327", "2328", "2329", "2330", "2331", "2335", "2336", "2336","2337","2337"]
 estaciones_a_buscar = ["BOGA", "BOGT"]
 
 # Ruta base
