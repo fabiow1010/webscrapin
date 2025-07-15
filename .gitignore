@@ -8,3 +8,5 @@ __pycache__/
 cookies.txt
 graficas_salida/
 graficas_descargas/
+*coordenadas_extraidas.csv
+*coordenadas_extraidas.xlsx
