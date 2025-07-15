@@ -1,61 +1,92 @@
 # GNSS FabiDev
-Este proyecto contiene scripts para descargar y analizar archivos de efemérides y coordenadas GNSS.
+
+Este proyecto permite descargar, procesar y analizar archivos de efemérides GNSS y coordenadas de estaciones, integrando scripts para automatizar todo el flujo de trabajo.
 
 ## Estructura de carpetas
 
-- `scripts/`: Contiene los scripts principales.
-- `descargas/`: Carpeta donde se guardan los archivos descargados por `script.py`.
-- `salidas/`: Carpeta donde se guardan los archivos .crd y resultados procesados por `semanas.py`.
+- `scripts/`: Scripts principales (`index.py`, `script.py`, `semanas.py`).
+- `descargas/`: Archivos SP3 descargados.
+- `salidas/`: Archivos `.crd`, resultados procesados y gráficos generados.
+- `config/`: Archivos de configuración (por ejemplo, credenciales y parámetros).
+- `requeriments.txt`: Lista de dependencias.
 
 ## Requisitos
 
 - Python 3.x
-- Paquetes: `requests`, `pandas`, `numpy`, `matplotlib`
+- Paquetes: `requests`, `pandas`, `numpy`, `matplotlib`, `ftplib`
 
 Instala los paquetes necesarios con:
 
-```
-pip install requests pandas numpy matplotlib
-```
-o con:
-```
+```bash
 pip install -r requeriments.txt
 ```
-## Ejecución de scripts
 
-### 1. Descargar archivos SP3 de efemérides (CDDIS/NASA)
+## Configuración inicial
 
-El script `scripts/script.py` descarga archivos SP3 comprimidos (`.sp3.Z`) de efemérides GNSS desde el servidor de CDDIS/NASA para semanas y días específicos.
+1. Crea un archivo `.env` en la carpeta `scripts`, allí deben estar las credenciales, usuario y contraseña de acceso a CDDIS/NASA:
+   1. ```bash
+   USUARIO=username
+CONTRASENA=password
+   ``` 
+2. Edita `scripts/index` para definir:
+    - Semanas a procesar.
+    - Bases .
+    - Parámetros de estaciones y rutas.
+
+## Ejecución del sistema
+
+### 1. Flujo automatizado con `index.py`
+
+`index.py` coordina la descarga y análisis de archivos SP3 y `.crd` en un solo paso.
 
 **Uso:**
 
-1. Edita las variables `semanas`, `dia_central`, `usuario` y `contraseña` en `script.py` según tus necesidades.
-2. Ejecuta el script:
-
+```bash
+python scripts/index.py
 ```
+
+El script lee la configuración, descarga los archivos necesarios y genera los resultados en `salidas/`.
+
+### 2. Descarga manual de archivos SP3 (`script.py`)
+
+Descarga archivos SP3 comprimidos desde CDDIS/NASA para semanas y días específicos.
+
+**Uso:**
+
+1. Edita las variables en `script.py` o usa la configuración en `config.json`.
+2. Ejecuta:
+
+```bash
 python scripts/script.py
 ```
 
-Los archivos descargados se guardarán en la carpeta `descargas/` organizada por semana.
+Archivos descargados se guardan en `descargas/`.
 
-### 2. Descargar y analizar archivos .crd de SIRGAS
+### 3. Descarga y análisis de archivos `.crd` (`semanas.py`)
 
-El script `scripts/semanas.py` se conecta al servidor FTP de SIRGAS, descarga archivos `.crd` de coordenadas para las semanas especificadas y realiza un análisis de la estación BOGA.
+Conecta al FTP de SIRGAS, descarga archivos `.crd` y analiza la estación BOGA.
 
 **Uso:**
 
-1. Edita la lista `semanas` en `semanas.py` si deseas otras semanas.
-2. Ejecuta el script:
+1. Edita la lista de semanas en `semanas.py` o usa la configuración en `config.json`.
+2. Ejecuta:
 
-```
+```bash
 python scripts/semanas.py
 ```
 
-Esto descargará los archivos `.crd` a la carpeta `salidas/`, generará un archivo `DATA.csv` con los datos de la estación BOGA y mostrará gráficos de los cambios en coordenadas.
+Resultados y gráficos se guardan en `salidas/`.
+
+## Resultados
+
+- Archivos SP3 y `.crd` organizados por semana.
+- Archivo `DATA.csv` con datos procesados de la estación BOGA.
+- Gráficos de evolución de coordenadas en `salidas/`.
 
 ---
 
-**Nota:**
-- Asegúrate de tener conexión a internet.
-- Para el script de CDDIS/NASA necesitas usuario y contraseña válidos para CDDIS.
-- Los scripts pueden requerir permisos de escritura en las carpetas de destino.
+**Notas:**
+- Requiere conexión a internet.
+- Credenciales válidas para CDDIS/NASA.
+- Permisos de escritura en carpetas de destino.
+- Consulta los comentarios en cada script para personalizaciones avanzadas.
