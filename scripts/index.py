@@ -7,11 +7,11 @@ from extracion import extraer_coordenadas_desde_htmls
 from deslpazamientos import generar_graficas_desplazamientos
 
 # Parámetros
-semanas = [2335,2336,2337,2338]
-estaciones = ["BOGA", "BOGT"]
-dia_central = 6
-ruta_excel = "coordenadas_extraidas.xlsx"
-carpeta_salidas = "graficas_salida"
+#semanas = [2335,2336,2337,2338]
+#estaciones = ["BOGA", "BOGT"]
+#dia_central = 6
+#ruta_excel = "coordenadas_extraidas.xlsx"
+#carpeta_salidas = "graficas_salida"
 
 # 1. Descarga GPS y GLONASS
 try:

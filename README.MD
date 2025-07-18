@@ -136,3 +136,4 @@ python scripts/deslpazamientos.py
 * Algunas fuentes requieren **credenciales válidas** (como CDDIS/NASA).
 * Verifica que tengas **permisos de escritura** en las carpetas de trabajo.
 * Los comentarios en los scripts te orientarán para hacer ajustes personalizados (por ejemplo, nombre de columnas en el Excel, estaciones específicas, rutas, etc.).
+* Se encuentra en etapa de desarrollo una interfaz mediante Tkinter que pérmita llevar el flujo de trabajo del el alistamiento de datos para levantamientos GNSS de una manera mas interactiva, se recomienda discresión con su uso.

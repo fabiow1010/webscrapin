@@ -74,7 +74,7 @@ root.geometry("600x500")
 # --- Entradas ---
 tk.Label(root, text="Semanas (separadas por coma)").pack()
 entry_semanas = tk.Entry(root, width=50)
-entry_semanas.insert(0, "2335,2336,2337,2338")
+entry_semanas.insert(0, "")
 entry_semanas.pack()
 
 tk.Label(root, text="Estaciones (separadas por coma)").pack()
