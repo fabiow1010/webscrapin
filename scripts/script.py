@@ -90,7 +90,7 @@ def descargar_glonass(weeks, dia_central):
     session.headers.update({'User-Agent': 'nasa-client'})
 
     tipos = ["sp3"]
-    centros = ["igl"]
+    centros = ["igl","igu","igv"]
 
     for week, day in pares:
         folder = os.path.join(base_path, str(week))

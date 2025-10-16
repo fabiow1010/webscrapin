@@ -66,6 +66,14 @@ def ejecutar_graficas_desplazamiento():
     except Exception as e:
         messagebox.showerror("Error", f"Error al generar gráficas:\n{e}")
 
+# --Ruta de salida--
+if not os.path.exists("graficas_salida"):
+    os.makedirs("graficas_salida")
+def seleccionar_carpeta():
+    ruta = filedialog.askdirectory(title="Seleccionar carpeta de salida")
+    if ruta:
+        entry_salida.delete(0, tk.END)
+        entry_salida.insert(0, ruta)
 # --- Interfaz gráfica ---
 root = tk.Tk()
 root.title("GNSS Pipeline - IGAC / SIRGAS")
@@ -101,8 +109,8 @@ entry_salida.pack()
 tk.Button(root, text="1️. Descargar GPS y GLONASS", command=ejecutar_descarga_gps_glonass).pack(pady=4)
 tk.Button(root, text="2️. Descargar CRD SIRGAS", command=ejecutar_descarga_crd_sirgas).pack(pady=4)
 tk.Button(root, text="3️. Descargar CRD IGAC", command=ejecutar_descarga_crd_igac).pack(pady=4)
-tk.Button(root, text="4️. Analizar estaciones", command=ejecutar_analisis_estaciones).pack(pady=4)
-tk.Button(root, text="5️. Extraer coordenadas de HTML", command=ejecutar_extraccion_coordenadas).pack(pady=4)
-tk.Button(root, text="6️. Generar gráficas de desplazamiento", command=ejecutar_graficas_desplazamiento).pack(pady=4)
+#tk.Button(root, text="4️. Analizar estaciones", command=ejecutar_analisis_estaciones).pack(pady=4)
+#tk.Button(root, text="5️. Extraer coordenadas de HTML", command=ejecutar_extraccion_coordenadas).pack(pady=4)
+#tk.Button(root, text="6️. Generar gráficas de desplazamiento", command=ejecutar_graficas_desplazamiento).pack(pady=4)
 
 root.mainloop()
